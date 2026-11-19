@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "client-kestrel",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["BRAND_FILE=brands/kestrel.json", "npm", "run", "dev", "-w", "client", "--", "--port", "5174"],
+      "port": 5174
+    }
+  ]
+}

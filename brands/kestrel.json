@@ -1,0 +1,115 @@
+{
+  "id": "kestrel",
+  "name": "Kestrel",
+  "legalName": "Kestrel Money plc",
+  "logo": { "glyph": "🪶", "text": "Kestrel" },
+  "palette": {
+    "primary": "#0E7C66",
+    "primaryText": "#FFFFFF",
+    "accent": "#DDF3EC",
+    "background": "#F3F8F6",
+    "surface": "#FFFFFF",
+    "text": "#0D2420",
+    "muted": "#5A716C",
+    "border": "#D5E5E0",
+    "success": "#0E7C66",
+    "warning": "#B45309",
+    "danger": "#C2410C",
+    "heroFrom": "#0E7C66",
+    "heroTo": "#3FB68F"
+  },
+  "font": {
+    "family": "'DM Sans', system-ui, sans-serif",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+  },
+  "locale": "en-GB",
+  "currency": { "code": "GBP" },
+  "products": [
+    { "id": "easy-access", "name": "Instant Saver", "rate": "4.50% AER", "blurb": "Your money, whenever you need it." },
+    { "id": "cash-isa", "name": "Flexible ISA", "rate": "4.35% AER", "blurb": "Tax-free and flexible." },
+    { "id": "prize-savings", "name": "Lucky Pot", "rate": "Weekly draw", "blurb": "Win cash prizes every week." },
+    { "id": "stocks-shares-isa", "name": "Investment ISA", "rate": "From £5", "blurb": "Low-cost tracker funds. Capital at risk." },
+    { "id": "pension", "name": "Kestrel Pension", "rate": "Tax relief added", "blurb": "Combine old pensions in one place. Capital at risk." }
+  ],
+  "banks": [
+    { "id": "fellside", "name": "Fellside Bank" },
+    { "id": "quayside", "name": "Quayside Savings" },
+    { "id": "lumen", "name": "Lumen" },
+    { "id": "ridgeway", "name": "Ridgeway Building Society" }
+  ],
+  "copy": {
+    "common": {
+      "back": "Back",
+      "continue": "Next",
+      "stepLabel": "{n}/{total}",
+      "startOver": "Start over",
+      "loading": "Just a sec…"
+    },
+    "welcome": {
+      "title": "Money that works as hard as you",
+      "subtitle": "Kestrel helps you save, invest and plan ahead — all from your phone.",
+      "bullets": ["Top-tier interest", "Protected by the FSCS", "Set up in 5 minutes"],
+      "cta": "Open an account",
+      "secondary": "Log in"
+    },
+    "credentials": {
+      "title": "Set up your sign-in",
+      "subtitle": "Pick an email and password for Kestrel.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "name@email.com",
+      "passwordLabel": "Choose a password",
+      "passwordHint": "8 characters or more",
+      "cta": "Continue",
+      "errorEmail": "That email doesn't look right",
+      "errorPassword": "Use 8 characters or more"
+    },
+    "kyc": {
+      "title": "Verify your identity",
+      "subtitle": "A quick legal check before we open your account.",
+      "nameLabel": "Name as it appears on your ID",
+      "dobLabel": "Birth date",
+      "postcodeLabel": "Home postcode",
+      "cta": "Check my details",
+      "pending": "Verifying…",
+      "passTitle": "Identity confirmed",
+      "passBody": "Welcome to Kestrel.",
+      "failTitle": "Verification unsuccessful",
+      "failBody": "We couldn't confirm your identity. Please check your details and try again.",
+      "reviewTitle": "Under review",
+      "reviewBody": "Our team is checking your application and will be in touch shortly."
+    },
+    "bankLink": {
+      "title": "Connect a bank account",
+      "subtitle": "Choose the account you'll pay in from.",
+      "consentTitle": "Allow Kestrel to access account details?",
+      "consentBody": "Kestrel Money plc will receive your account holder name and account details for payments. Revoke anytime in settings.",
+      "consentAllow": "Agree",
+      "consentCancel": "Not now",
+      "linking": "Linking your bank…",
+      "linkedTitle": "Connected"
+    },
+    "chooseProduct": {
+      "title": "Pick your first account",
+      "subtitle": "Open more any time.",
+      "cta": "Next"
+    },
+    "deposit": {
+      "subtitle": "Paying into {product}",
+      "customAmountLabel": "Custom amount",
+      "cta": "Pay in {amount}",
+      "skip": "Skip for now",
+      "processing": "Sending your payment…",
+      "killSwitchMessage": "Payments in are paused right now — your account is open and we'll notify you when they're back.",
+      "errorAmount": "Minimum is {min}"
+    },
+    "done": {
+      "title": "Welcome aboard",
+      "depositedBody": "{amount} is heading to your {product}.",
+      "noDepositBody": "Your {product} is open and ready.",
+      "cta": "Open dashboard"
+    },
+    "legal": {
+      "footer": "Kestrel Money plc is a fictional company created for demonstration purposes."
+    }
+  }
+}

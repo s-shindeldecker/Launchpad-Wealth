@@ -1,0 +1,115 @@
+{
+  "id": "launchpad",
+  "name": "Launchpad",
+  "legalName": "Launchpad Wealth Ltd",
+  "logo": { "glyph": "🚀", "text": "Launchpad" },
+  "palette": {
+    "primary": "#5B3DF5",
+    "primaryText": "#FFFFFF",
+    "accent": "#ECE8FF",
+    "background": "#F7F6FF",
+    "surface": "#FFFFFF",
+    "text": "#15132B",
+    "muted": "#6B6887",
+    "border": "#E3E0F2",
+    "success": "#119C5B",
+    "warning": "#C27803",
+    "danger": "#D93A3A",
+    "heroFrom": "#5B3DF5",
+    "heroTo": "#9B6BFF"
+  },
+  "font": {
+    "family": "'Plus Jakarta Sans', system-ui, sans-serif",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  },
+  "locale": "en-GB",
+  "currency": { "code": "GBP" },
+  "products": [
+    { "id": "easy-access", "name": "Easy Access", "rate": "4.55% AER", "blurb": "Save and withdraw whenever you like." },
+    { "id": "cash-isa", "name": "Cash ISA", "rate": "4.40% AER", "blurb": "Tax-free savings up to your ISA allowance." },
+    { "id": "prize-savings", "name": "Prize Savings", "rate": "Monthly prize draw", "blurb": "Every £1 is an entry into the monthly draw." },
+    { "id": "stocks-shares-isa", "name": "Stocks & Shares ISA", "rate": "Invest from £1", "blurb": "Ready-made funds, tax-free growth. Capital at risk." },
+    { "id": "pension", "name": "Pension", "rate": "25% tax top-up", "blurb": "Plan for later with government top-ups. Capital at risk." }
+  ],
+  "banks": [
+    { "id": "northgate", "name": "Northgate Bank" },
+    { "id": "harbour", "name": "Harbour Building Society" },
+    { "id": "meridian", "name": "Meridian" },
+    { "id": "oakline", "name": "Oakline Bank" }
+  ],
+  "copy": {
+    "common": {
+      "back": "Back",
+      "continue": "Continue",
+      "stepLabel": "Step {n} of {total}",
+      "startOver": "Start again",
+      "loading": "One moment…"
+    },
+    "welcome": {
+      "title": "Grow your money on autopilot",
+      "subtitle": "Savings, ISAs and investing in one app. Open an account in minutes.",
+      "bullets": ["Market-leading savings rates", "FSCS protected up to £85,000", "No fees to open"],
+      "cta": "Get started",
+      "secondary": "I already have an account"
+    },
+    "credentials": {
+      "title": "Create your login",
+      "subtitle": "You'll use these to sign in to Launchpad.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordHint": "At least 8 characters",
+      "cta": "Create account",
+      "errorEmail": "Enter a valid email address",
+      "errorPassword": "Password must be at least 8 characters"
+    },
+    "kyc": {
+      "title": "Confirm it's you",
+      "subtitle": "We're required by law to verify your identity. It takes about a minute.",
+      "nameLabel": "Full legal name",
+      "dobLabel": "Date of birth",
+      "postcodeLabel": "Postcode",
+      "cta": "Verify my identity",
+      "pending": "Checking your details…",
+      "passTitle": "You're verified",
+      "passBody": "Your Launchpad account is open.",
+      "failTitle": "We couldn't verify you",
+      "failBody": "We weren't able to confirm your identity from the details given. You can try again or contact support.",
+      "reviewTitle": "We're taking a closer look",
+      "reviewBody": "Your details need a manual check. We'll email you within one working day."
+    },
+    "bankLink": {
+      "title": "Link your bank",
+      "subtitle": "Connect the account you'll fund Launchpad from. We use secure Open Banking.",
+      "consentTitle": "Share account details with Launchpad?",
+      "consentBody": "Launchpad Wealth Ltd will be able to see your account name, number and sort code to set up deposits. You can withdraw consent at any time.",
+      "consentAllow": "Allow",
+      "consentCancel": "Cancel",
+      "linking": "Connecting securely…",
+      "linkedTitle": "Bank linked"
+    },
+    "chooseProduct": {
+      "title": "Choose where to start",
+      "subtitle": "You can add more accounts later.",
+      "cta": "Continue"
+    },
+    "deposit": {
+      "subtitle": "Into your {product}",
+      "customAmountLabel": "Other amount",
+      "cta": "Deposit {amount}",
+      "skip": "Maybe later",
+      "processing": "Processing your deposit…",
+      "killSwitchMessage": "Deposits are temporarily unavailable — your account is ready and we'll let you know.",
+      "errorAmount": "Enter an amount of at least {min}"
+    },
+    "done": {
+      "title": "You're all set",
+      "depositedBody": "{amount} is on its way to your {product}.",
+      "noDepositBody": "Your {product} is ready whenever you are.",
+      "cta": "Go to my account"
+    },
+    "legal": {
+      "footer": "Launchpad Wealth Ltd is a fictional company created for demonstration purposes."
+    }
+  }
+}
