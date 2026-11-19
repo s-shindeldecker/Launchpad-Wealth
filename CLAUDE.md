@@ -87,6 +87,25 @@ Both flags are created manually in the LaunchDarkly UI and must be marked availa
 
 Cut list, in order: Databricks live → kill switch → manual-review KYC branch → product-selection screen (hardcode Easy Access).
 
+## Testing the flow
+
+Run with `npm run dev`, open http://localhost:5173. Server logs (device/user key per call) appear in the same terminal.
+
+**KYC outcomes (screen 3) are deterministic.** The server decides, in this order:
+
+1. `simulateOutcome` in the `/kyc` request body — set by the simulator, or by the client when the URL has `?kyc=fail` or `?kyc=review`.
+2. Test identity typed in the **Full legal name** field (case-insensitive, whole word):
+   - name contains `fail` (e.g. `Alex Fail`) → **fail** — no `account_created`
+   - name contains `review` (e.g. `Sam Review`) → **manual review** — no `account_created`
+3. Otherwise → **pass** (fires `account_created` from Friday PM).
+
+Use the test-identity names during a live demo (nothing visible in the URL bar); use `?kyc=` for quick repeat testing. Any email and an 8+ character password work on screen 2; DOB and postcode just need a value.
+
+**Other testing notes**
+- New device / new exposure: clear site localStorage and reload (the device key lives there).
+- Brand swap: `BRAND_FILE=brands/kestrel.json npm run dev`.
+- Stub server listens on 4100 (`SERVER_PORT`); 3001 is taken by a local Docker container on the presenter's machine.
+
 ## Acceptance checks
 
 - One exposure per device per session in LaunchDarkly, none from the server.

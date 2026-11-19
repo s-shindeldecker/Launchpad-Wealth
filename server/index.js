@@ -57,13 +57,28 @@ api.post('/signup', (req, res) => {
   res.json({ userId });
 });
 
-// Screen 3 → simulated async KYC. Default pass; `simulateOutcome` lets the presenter
-// (via ?kyc=fail|review in the client URL) or the simulator force a branch.
+// Sandbox test identities, the way real KYC providers do it: a deterministic outcome
+// from what's typed in the form, so a presenter can trigger branches from the UI.
+// Full legal name containing the word "fail" → fail, "review" → manual review.
+// (e.g. "Alex Fail", "Sam Review"). Case-insensitive. See CLAUDE.md "Testing the flow".
+function outcomeFromDetails(details = {}) {
+  const name = String(details.name ?? '').toLowerCase();
+  if (/\bfail\b/.test(name)) return 'fail';
+  if (/\breview\b/.test(name)) return 'review';
+  return null;
+}
+
+// Screen 3 → simulated async KYC. Outcome precedence:
+//   1. `simulateOutcome` in the body (simulator, or ?kyc=fail|review in the client URL)
+//   2. test-identity name in `details` (typed on the KYC screen)
+//   3. pass
 api.post('/kyc', async (req, res) => {
   const ctx = requireContext(req, res);
   if (!ctx) return;
   const requested = req.body.simulateOutcome;
-  const outcome = KYC_OUTCOMES.has(requested) ? requested : 'pass';
+  const outcome = KYC_OUTCOMES.has(requested)
+    ? requested
+    : outcomeFromDetails(req.body.details) ?? 'pass';
   await sleep(KYC_DELAY_MS);
   logCall('kyc', ctx, { outcome });
 

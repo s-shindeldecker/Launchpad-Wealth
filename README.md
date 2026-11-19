@@ -13,7 +13,9 @@ npm run dev
 - App: http://localhost:5173 (proxies `/api` to the server)
 - Server: http://localhost:4100 (override with `SERVER_PORT`)
 
-Presenter shortcuts: `?kyc=fail` or `?kyc=review` in the URL forces that KYC branch.
+KYC test identities: type a full legal name containing `fail` (e.g. "Alex Fail") or
+`review` (e.g. "Sam Review") on the identity screen. `?kyc=fail|review` in the URL also
+works. Details in CLAUDE.md → "Testing the flow".
 
 ## Swap brand (no code change)
 
