@@ -29,6 +29,7 @@ from the brand file. The deposit headline/amounts on screen 6 come from the
 
 ## Status
 
-Thursday step: all 7 screens, stubbed server, no LaunchDarkly. Integration points are
-marked `TODO(Fri AM)`, `TODO(Fri PM)` and `TODO(Sat/Sun)` — start in `client/src/ld/index.js`
-and `server/index.js`.
+Friday AM step: LaunchDarkly JS client SDK (`@launchdarkly/js-client-sdk`) in
+`client/src/ld/index.js` — anonymous device context on load, identify to device+user after
+signup, `onboarding-deposit-prompt` evaluated once on screen 6. Requires `LD_CLIENT_SIDE_ID`
+in `.env`. Server is still stubbed; `track()` points are marked `TODO(Fri PM)`.

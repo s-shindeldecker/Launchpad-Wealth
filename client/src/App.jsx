@@ -15,13 +15,16 @@ const NUMBERED_STEPS = SCREENS.length - 2; // screens 2–6 show "Step n of 5"
 
 export default function App() {
   const [device, setDevice] = useState(null);
+  const [initError, setInitError] = useState(null);
   const [step, setStep] = useState(0);
   const [session, setSession] = useState({});
 
+  // Starts the LD client with the anonymous device context. Does NOT evaluate any flag.
   useEffect(() => {
-    initDevice().then(setDevice);
+    initDevice().then(setDevice).catch((err) => setInitError(err.message));
   }, []);
 
+  if (initError) return <PhoneFrame><p className="init-error">{initError}</p></PhoneFrame>;
   if (!device) return <PhoneFrame />;
 
   const Screen = SCREENS[step];

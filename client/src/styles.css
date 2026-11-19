@@ -114,3 +114,4 @@ button { font: inherit; color: inherit; }
 .result__icon--success { background: var(--success); }
 .result__icon--danger { background: var(--danger); }
 .result__icon--warning { background: var(--warning); }
+.init-error { margin: auto; padding: 24px; text-align: center; color: var(--danger); font-family: ui-monospace, monospace; font-size: 13px; }

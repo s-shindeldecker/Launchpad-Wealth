@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     envDir: repoRoot,
+    // Expose exactly one secret-free value to the browser bundle. Never LD_SDK_KEY
+    // (server-side key) or DATABRICKS_* — those stay on the server.
+    define: {
+      'import.meta.env.LD_CLIENT_SIDE_ID': JSON.stringify(env.LD_CLIENT_SIDE_ID || ''),
+    },
     resolve: {
       // All customer-facing naming/palette/copy comes from this one file.
       // Swap brands with BRAND_FILE=brands/kestrel.json — no code change.
