@@ -29,7 +29,13 @@ from the brand file. The deposit headline/amounts on screen 6 come from the
 
 ## Status
 
+Friday PM step: LaunchDarkly Node server SDK (`@launchdarkly/node-server-sdk`) in
+`server/index.js`, used only for `track()`: `account_created` on KYC pass and
+`deposit_confirmed` (metricValue = amount) on deposit, both against the context the client
+sent in the request body. The server evaluates no flags. Requests without a context that
+includes a device key get a 400 and are not tracked. Requires `LD_SDK_KEY` in `.env`
+(without it the server runs and logs conversions as untracked).
+
 Friday AM step: LaunchDarkly JS client SDK (`@launchdarkly/js-client-sdk`) in
 `client/src/ld/index.js` — anonymous device context on load, identify to device+user after
-signup, `onboarding-deposit-prompt` evaluated once on screen 6. Requires `LD_CLIENT_SIDE_ID`
-in `.env`. Server is still stubbed; `track()` points are marked `TODO(Fri PM)`.
+signup, `onboarding-deposit-prompt` evaluated once on screen 6.
