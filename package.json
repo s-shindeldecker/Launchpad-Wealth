@@ -5,12 +5,14 @@
   "description": "Onboarding experiment demo: phone-framed client, stub backend, traffic simulator.",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "sim"
   ],
   "scripts": {
     "dev": "concurrently -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
-    "start:server": "npm run start -w server"
+    "start:server": "npm run start -w server",
+    "sim": "npm run start -w sim --"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

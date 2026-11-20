@@ -1,6 +1,6 @@
 # Launchpad onboarding experiment demo
 
-Phone-framed onboarding flow (`client/`), stub backend (`server/`), and — later — a traffic
+Phone-framed onboarding flow (`client/`), stub backend (`server/`), and a traffic
 simulator (`sim/`). See `CLAUDE.md` for the full spec and build order.
 
 ## Run
@@ -29,11 +29,15 @@ from the brand file. The deposit headline/amounts on screen 6 come from the
 
 ## Status
 
+Friday evening step: `sim/` traffic simulator — `npm run sim` (loop, 3 devices/min) or
+`npm run sim -- --once --count 20`. See `sim/README.md`.
+
 Friday PM step: LaunchDarkly Node server SDK (`@launchdarkly/node-server-sdk`) in
 `server/index.js`, used only for `track()`: `account_created` on KYC pass and
 `deposit_confirmed` (metricValue = amount) on deposit, both against the context the client
-sent in the request body. The server evaluates no flags. Requests without a context that
-includes a device key get a 400 and are not tracked. Requires `LD_SDK_KEY` in `.env`
+sent in the request body. The server evaluates no flags. A request without a usable
+context (no device key) still succeeds; its conversion is skipped with a "NOT attributed"
+warning. Requires `LD_SDK_KEY` in `.env`
 (without it the server runs and logs conversions as untracked).
 
 Friday AM step: LaunchDarkly JS client SDK (`@launchdarkly/js-client-sdk`) in

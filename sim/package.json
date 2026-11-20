@@ -1,0 +1,12 @@
+{
+  "name": "sim",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=../.env index.js"
+  },
+  "dependencies": {
+    "@launchdarkly/node-server-sdk": "^9.17.0"
+  }
+}
