@@ -10,7 +10,11 @@
 //    experiment would have no unit to bucket on screens 1–2 and would re-bucket at signup.
 //  - `onboarding-deposit-prompt` is evaluated ONLY in evaluateDepositPrompt(), called from
 //    the Deposit screen (screen 6). Never at init, never via allFlags(). start() fetches
-//    flag values but sends no evaluation events — only a variation call is an exposure.
+//    flag values but sends no evaluation events — only a variation call counts.
+//    The risk is evaluating TOO EARLY: a device evaluated at app load or in a bulk read is
+//    counted as exposed even if it drops out before screen 6, diluting the experiment.
+//    Re-evaluating later is harmless — LaunchDarkly counts one exposure per context per
+//    experiment no matter how many times that context evaluates the flag.
 
 import { basicLogger, createClient } from '@launchdarkly/js-client-sdk';
 
@@ -18,19 +22,19 @@ const CLIENT_SIDE_ID = import.meta.env.LD_CLIENT_SIDE_ID;
 const DEPOSIT_PROMPT_FLAG = 'onboarding-deposit-prompt';
 const PLATFORM_KEY = 'demo.platform';
 
-// Code default = control variation (served if LD is unreachable or the flag is missing).
+// Code default: control copy (served if LD is unreachable or the flag is missing).
+// Deliberately has NO `variation` field — when this is served we don't know the device's
+// assignment, so the server is told "unknown" rather than a guess.
 export const DEPOSIT_PROMPT_DEFAULT = {
   headline: 'Make your first deposit',
   amounts: [10, 25, 50],
   framing: 'start-small',
 };
 
-// JSON values don't carry their variation name, so map the served variation index to the
-// names in CLAUDE.md "Flag setup spec". Must match the variation order in the LD UI.
-const DEPOSIT_PROMPT_VARIATIONS = ['control', 'earn-first'];
-
 let client = null;
-let depositPrompt = null; // per-page-load memo → one evaluation (one exposure) per session
+// Per-page-load memo, kept for simplicity (stable copy if the user goes back and forth).
+// Not needed for exposure counting: re-evaluating would not create a second exposure.
+let depositPrompt = null;
 
 function safeGet(k) {
   try { return localStorage.getItem(k); } catch { return null; }
@@ -92,23 +96,23 @@ export function getContext() {
   return client?.getContext() ?? null;
 }
 
-// Screen 6 only. One call per page load = one evaluation = one exposure.
+// Screen 6 only — the single place this flag is evaluated.
 export function evaluateDepositPrompt() {
   if (depositPrompt) return depositPrompt;
 
   const detail = client.jsonVariationDetail(DEPOSIT_PROMPT_FLAG, DEPOSIT_PROMPT_DEFAULT);
-  const served = detail.variationIndex ?? null;
-  const variationKey = served === null ? 'default' : DEPOSIT_PROMPT_VARIATIONS[served] ?? `index-${served}`;
+  // The variation name travels inside the flag's JSON value (`variation` field).
+  const variation = typeof detail.value?.variation === 'string' ? detail.value.variation : 'unknown';
 
-  if (served === null) {
+  if (detail.reason?.kind === 'ERROR') {
     // Code default served. Check the flag exists in this environment and has
     // "SDKs using Client-side ID" enabled before debugging code.
     console.warn(`[ld] ${DEPOSIT_PROMPT_FLAG} served code default`, detail.reason);
   } else if (import.meta.env.DEV) {
-    console.info(`[ld] ${DEPOSIT_PROMPT_FLAG} → ${variationKey} (variation index ${served})`);
+    console.info(`[ld] ${DEPOSIT_PROMPT_FLAG} → ${variation}`);
   }
 
-  depositPrompt = { ...DEPOSIT_PROMPT_DEFAULT, ...detail.value, variationKey };
+  depositPrompt = { ...DEPOSIT_PROMPT_DEFAULT, ...detail.value, variation };
   return depositPrompt;
 }
 

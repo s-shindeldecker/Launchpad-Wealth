@@ -44,8 +44,8 @@ Secrets live in `.env` (never committed). Provide `.env.example` with placeholde
 ### `onboarding-deposit-prompt` — JSON flag, the experiment
 
 Variations:
-- `control`: `{ "headline": "Make your first deposit", "amounts": [10, 25, 50], "framing": "start-small" }`
-- `earn-first`: `{ "headline": "Start earning 4.55% today", "amounts": [100, 500, 1000], "framing": "rate-led" }`
+- `control`: `{ "variation": "control", "headline": "Make your first deposit", "amounts": [10, 25, 50], "framing": "start-small" }`
+- `earn-first`: `{ "variation": "earn-first", "headline": "Start earning 4.55% today", "amounts": [100, 500, 1000], "framing": "rate-led" }`
 
 Rules:
 - Evaluated **only** when screen 6 renders. Not at app load, not in a bulk read of all flags into state. One evaluation, one exposure.
@@ -55,7 +55,31 @@ Rules:
 
 Off state renders a fallback message: "Deposits are temporarily unavailable — your account is ready and we'll let you know." Covers the release-risk / fallback-without-redeploy story.
 
-Both flags are created manually in the LaunchDarkly UI and must be marked available to client-side SDKs. If a flag evaluates to its default value in the client, check that setting before debugging code.
+### Flag setup spec (create exactly this, via MCP or by hand, then verify in the UI)
+
+Project: `launchpad-wealth`. Environment: the one whose keys are in `.env` (default `production` unless `.env` says otherwise).
+
+**`onboarding-deposit-prompt`**
+- Name: "Onboarding – first deposit prompt"
+- Type: JSON (multivariate), permanent flag
+- Variations (name → value):
+  - `control` → `{ "variation": "control", "headline": "Make your first deposit", "amounts": [10, 25, 50], "framing": "start-small" }`
+  - `earn-first` → `{ "variation": "earn-first", "headline": "Start earning 4.55% today", "amounts": [100, 500, 1000], "framing": "rate-led" }`
+- Default variation when flag is ON: `control`. When OFF: `control`.
+- Client-side availability: **SDKs using Client-side ID = ON** (`clientSideAvailability.usingEnvironmentId: true`). Mobile key = ON too (harmless, mirrors the customer's native apps).
+- Targeting: ON. No individual targets, no rules. Default rule serves `control`. The experiment will own the traffic split later — do not add a percentage rollout.
+- Tags: `demo`, `onboarding`, `experiment`
+
+**`onboarding-deposit-step`** (built last)
+- Name: "Onboarding – deposit step kill switch"
+- Type: boolean, permanent flag
+- Variations: `true` = "Deposit step available", `false` = "Deposit step disabled (fallback message)"
+- Default when ON: `true`. When OFF: `false`.
+- Client-side availability: SDKs using Client-side ID = ON
+- Targeting: ON, default rule serves `true`
+- Tags: `demo`, `onboarding`, `kill-switch`
+
+If a flag evaluates to its code default in the client, check client-side availability before debugging code.
 
 ## Metrics (LaunchDarkly-tracked via server `track()` on the client's context)
 
@@ -87,25 +111,6 @@ Both flags are created manually in the LaunchDarkly UI and must be marked availa
 
 Cut list, in order: Databricks live → kill switch → manual-review KYC branch → product-selection screen (hardcode Easy Access).
 
-## Testing the flow
-
-Run with `npm run dev`, open http://localhost:5173. Server logs (device/user key per call) appear in the same terminal.
-
-**KYC outcomes (screen 3) are deterministic.** The server decides, in this order:
-
-1. `simulateOutcome` in the `/kyc` request body — set by the simulator, or by the client when the URL has `?kyc=fail` or `?kyc=review`.
-2. Test identity typed in the **Full legal name** field (case-insensitive, whole word):
-   - name contains `fail` (e.g. `Alex Fail`) → **fail** — no `account_created`
-   - name contains `review` (e.g. `Sam Review`) → **manual review** — no `account_created`
-3. Otherwise → **pass** (fires `account_created` from Friday PM).
-
-Use the test-identity names during a live demo (nothing visible in the URL bar); use `?kyc=` for quick repeat testing. Any email and an 8+ character password work on screen 2; DOB and postcode just need a value.
-
-**Other testing notes**
-- New device / new exposure: clear site localStorage and reload (the device key lives there).
-- Brand swap: `BRAND_FILE=brands/kestrel.json npm run dev`.
-- Stub server listens on 4100 (`SERVER_PORT`); 3001 is taken by a local Docker container on the presenter's machine.
-
 ## Acceptance checks
 
 - One exposure per device per session in LaunchDarkly, none from the server.
@@ -115,6 +120,6 @@ Use the test-identity names during a live demo (nothing visible in the URL bar);
 
 ## Decisions (settled — do not revisit without asking)
 
-1. **LaunchDarkly project:** fresh project `launchpad-wealth`, created manually in the LaunchDarkly UI along with the experiment flag. Code uses the keys in `.env`; do not create projects or flags via API.
+1. **LaunchDarkly project:** fresh project `launchpad-wealth`, created manually in the LaunchDarkly UI. Flags are created from the "Flag setup spec" in this file, either via the LaunchDarkly MCP or by hand, and verified in the UI before any code depends on them. Code uses the keys in `.env`; never create projects, environments, metrics, or experiments from code.
 2. **Simulator:** runs in a continuous loop (configurable interval and batch size) from Friday evening through the demo so results keep arriving live. Must be safe to stop and restart without duplicating a device's exposure.
 3. **Kill switch flag `onboarding-deposit-step`:** in scope, built last — after the Databricks writer, before Monday polish.

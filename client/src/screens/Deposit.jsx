@@ -7,9 +7,11 @@ import { depositStepEnabled, evaluateDepositPrompt } from '../ld/index.js';
 const MIN_DEPOSIT = 1;
 
 // Screen 6 — THE EXPERIMENT SURFACE.
-// `onboarding-deposit-prompt` is evaluated here and only here, exactly once per render of
-// this screen (useRef guard), producing exactly one exposure. The headline/amounts/framing
-// come from the flag variation, not brand.json — that's what the experiment varies.
+// `onboarding-deposit-prompt` is evaluated here and only here — never earlier — so only
+// devices that actually reach this screen are counted as exposed. The useRef guard just
+// keeps the copy stable across re-renders; LaunchDarkly counts one exposure per context
+// per experiment however often it evaluates. The headline/amounts/framing come from the
+// flag variation, not brand.json — that's what the experiment varies.
 export default function Deposit({ nav, session, update }) {
   const { copy, formatMoney } = useBrand();
   const c = copy.deposit;
@@ -56,7 +58,7 @@ export default function Deposit({ nav, session, update }) {
       const res = await api.deposit(session.userId, {
         amount: value,
         productId: session.product?.id,
-        variation: prompt.variationKey, // client tells server; server never evaluates the flag
+        variation: prompt.variation, // from the flag JSON, or 'unknown'; server never evaluates the flag
       });
       update({ deposit: res.amount });
       nav.next();
