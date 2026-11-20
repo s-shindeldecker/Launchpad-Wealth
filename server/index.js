@@ -35,8 +35,14 @@ if (process.env.LD_SDK_KEY) {
   console.warn('[ld] LD_SDK_KEY not set — conversions will NOT be tracked');
 }
 
-// Track a conversion against the context the CLIENT sent, unchanged.
-function trackConversion(eventKey, ctx, data, metricValue) {
+// Track a conversion against the context the CLIENT sent, unchanged. `ctxError` is the
+// validation result from contextFrom(): if the context isn't usable the conversion is
+// skipped (warning logged) — the business action itself has already succeeded.
+function trackConversion(eventKey, ctx, ctxError, data, metricValue) {
+  if (ctxError) {
+    console.warn(`[ld] NOT attributed: ${eventKey} not tracked — ${ctxError}`);
+    return;
+  }
   const { device, user } = keysOf(ctx);
   if (!ldClient) {
     console.warn(`[ld] NOT tracked ${eventKey} device=${device} (no LD_SDK_KEY)`);
@@ -73,27 +79,23 @@ function keysOf(ctx) {
 }
 
 // The context must come from the client and must contain the device (the experiment's
-// randomization unit). If it's missing or has no device key the request is rejected:
-// there is deliberately NO fallback to a context built from userId — that is exactly the
-// broken attribution this demo is about. Nothing is tracked for a rejected request.
-function requireContext(req, res) {
+// randomization unit). If it's missing or has no device key, the request still succeeds
+// — a deposit never fails because tracking data is missing — but no conversion is
+// tracked. There is deliberately NO fallback to a context built from userId: that is
+// exactly the broken attribution this demo is about.
+function contextFrom(req) {
   const ctx = req.body?.context;
-  const reason =
+  const error =
     !ctx || typeof ctx !== 'object' ? 'no context in request body'
     : !ctx.kind ? 'context has no kind'
     : !keysOf(ctx).device ? 'context has no device key'
     : null;
-  if (reason) {
-    console.warn(`[${req.path.slice(1)}] rejected, NOT tracked: ${reason}`);
-    res.status(400).json({ error: `invalid LaunchDarkly context: ${reason}` });
-    return null;
-  }
-  return ctx;
+  return { ctx: error ? null : ctx, ctxError: error };
 }
 
 function logCall(route, ctx, extra = {}) {
   const { device, user } = keysOf(ctx);
-  console.log(`[${route}] device=${device} user=${user ?? '-'}`, extra);
+  console.log(`[${route}] device=${device ?? '-'} user=${user ?? '-'}`, extra);
 }
 
 const api = express.Router();
@@ -102,8 +104,7 @@ api.get('/health', (_req, res) => res.json({ ok: true }));
 
 // Screen 2 → returns userId. Client then identify()s with device + user multi-context.
 api.post('/signup', (req, res) => {
-  const ctx = requireContext(req, res);
-  if (!ctx) return;
+  const { ctx } = contextFrom(req);
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'email required' });
   const userId = `usr_${randomUUID()}`;
@@ -127,8 +128,7 @@ function outcomeFromDetails(details = {}) {
 //   2. test-identity name in `details` (typed on the KYC screen)
 //   3. pass
 api.post('/kyc', async (req, res) => {
-  const ctx = requireContext(req, res);
-  if (!ctx) return;
+  const { ctx, ctxError } = contextFrom(req);
   const requested = req.body.simulateOutcome;
   const outcome = KYC_OUTCOMES.has(requested)
     ? requested
@@ -138,15 +138,14 @@ api.post('/kyc', async (req, res) => {
 
   if (outcome === 'pass') {
     // Conversion `account_created` — on the CLIENT's context, as received.
-    trackConversion('account_created', ctx);
+    trackConversion('account_created', ctx, ctxError);
   }
   res.json({ status: outcome });
 });
 
 // Screen 4 → simulated Open Banking consent.
 api.post('/bank-link', (req, res) => {
-  const ctx = requireContext(req, res);
-  if (!ctx) return;
+  const { ctx } = contextFrom(req);
   const { bankId } = req.body;
   logCall('bank-link', ctx, { bankId });
   res.json({ linked: true, bankId, accountMask: '••••4821' });
@@ -155,8 +154,7 @@ api.post('/bank-link', (req, res) => {
 // Screen 6 → deposit confirmation. `variation` comes from the client; the server does
 // not evaluate the experiment flag.
 api.post('/deposit', (req, res) => {
-  const ctx = requireContext(req, res);
-  if (!ctx) return;
+  const { ctx, ctxError } = contextFrom(req);
   const amount = Number(req.body.amount);
   if (!Number.isFinite(amount) || amount <= 0) {
     return res.status(400).json({ error: 'amount must be a positive number' });
@@ -166,7 +164,7 @@ api.post('/deposit', (req, res) => {
 
   // Conversion `deposit_confirmed`, metricValue = amount — on the CLIENT's context, as
   // received. One event feeds both LD metrics (conversion: did they deposit; numeric: amount).
-  trackConversion('deposit_confirmed', ctx, { productId, variation }, amount);
+  trackConversion('deposit_confirmed', ctx, ctxError, { productId, variation }, amount);
   // TODO(Sat/Sun): if DATABRICKS_ENABLED, append conversion row to `onboarding_events`.
 
   res.json({ confirmed: true, depositId: `dep_${randomUUID()}`, amount });
