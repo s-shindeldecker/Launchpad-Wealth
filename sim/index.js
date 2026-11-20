@@ -5,6 +5,8 @@
 //   - after signup, the multi-context the client identify()s with: same device + user
 //   - every server call carries that context in the body, same request shapes as
 //     client/src/api.js, so conversions go through the server's real track() path
+//   - the client's funnel events (kyc_started, bank_linked, product_selected) are tracked
+//     via this process's SDK at the same points, on the same multi-context
 //   - only devices that reach the deposit screen evaluate `onboarding-deposit-prompt`,
 //     once, with the multi-context (randomization unit = device; onboarding starts before
 //     a user exists). The variation name comes from the JSON value's `variation` field.
@@ -146,6 +148,7 @@ async function runDevice(ldClient) {
     await think();
     if (!chance(STEP.kycSubmit)) return { ...r, outcome: 'dropped at kyc form' };
     step = 'kyc';
+    ldClient.track('kyc_started', context); // client: on KYC submit, before POST /kyc
     const roll = Math.random();
     const kycOutcome = roll < KYC.fail ? 'fail' : roll < KYC.fail + KYC.review ? 'review' : 'pass';
     const { status } = await post('/kyc', { userId, details: identity(), simulateOutcome: kycOutcome }, context);
@@ -155,12 +158,15 @@ async function runDevice(ldClient) {
     await think();
     if (!chance(STEP.bankLink)) return { ...r, outcome: 'dropped at bank link' };
     step = 'bank-link';
-    await post('/bank-link', { userId, bankId: pick(BANK_IDS) }, context);
+    const bankId = pick(BANK_IDS);
+    await post('/bank-link', { userId, bankId }, context);
+    ldClient.track('bank_linked', context, { bankId }); // client: after link succeeds
     r.reached = 'product';
 
     await think();
     if (!chance(STEP.product)) return { ...r, outcome: 'dropped at product' };
     const productId = weighted(PRODUCT_IDS.map((id, i) => [id, PRODUCT_WEIGHTS[i] ?? 1]));
+    ldClient.track('product_selected', context, { productId }); // client: on Continue
     r.reached = 'deposit';
 
     // Screen 6 renders → the ONE evaluation (exposure) for this device.
