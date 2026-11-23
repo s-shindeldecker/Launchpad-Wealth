@@ -3,12 +3,14 @@
 // Clears only the localStorage keys this app and the LaunchDarkly SDK write, then reloads to
 // Welcome. On load the SDK finds no stored device key, generates a fresh one and identifies
 // with it, so the next walk-through is a brand-new, never-exposed device.
-//   - `demo.*`         this app: demo.platform (device platform), demo.inspectorOpen
+//   - `demo.*`         this app: demo.platform (device platform)
 //   - `LaunchDarkly_*` the JS client SDK: generated context keys, cached flags, context index
-// Anything else on the origin is left alone.
+// Kept: demo.inspectorOpen — a presenter preference, not device state, so the Inspector
+// stays open (or hidden) across a new device. Anything else on the origin is left alone.
 
 const APP_PREFIX = 'demo.';
 const LD_PREFIX = 'LaunchDarkly_';
+const KEEP = new Set(['demo.inspectorOpen']);
 const TOAST_MS = 900;
 
 function ownedKeys() {
@@ -16,7 +18,8 @@ function ownedKeys() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && (k.startsWith(APP_PREFIX) || k.startsWith(LD_PREFIX))) keys.push(k);
+      if (!k || KEEP.has(k)) continue;
+      if (k.startsWith(APP_PREFIX) || k.startsWith(LD_PREFIX)) keys.push(k);
     }
   } catch {
     /* storage unavailable: nothing to clear */
