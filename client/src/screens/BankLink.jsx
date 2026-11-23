@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BrandIcon } from '../brand/BrandIcon.jsx';
 import { useBrand } from '../brand/BrandProvider.jsx';
 import { Button, Layout, Spinner } from '../components/Layout.jsx';
 import { api } from '../api.js';
@@ -45,7 +46,9 @@ export default function BankLink({ nav, session, update }) {
             <div className="sheet__banks">
               <span className="bank-avatar bank-avatar--lg">{bank.name[0]}</span>
               <span className="sheet__arrow">⇄</span>
-              <span className="bank-avatar bank-avatar--lg bank-avatar--brand">{brand.logo.glyph}</span>
+              <span className="bank-avatar bank-avatar--lg bank-avatar--brand">
+                <BrandIcon size={26} colorKey="primaryText" />
+              </span>
             </div>
             <h2 className="sheet__title">{c.consentTitle}</h2>
             <p className="muted">{c.consentBody}</p>

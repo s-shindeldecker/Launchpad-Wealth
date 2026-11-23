@@ -21,3 +21,6 @@ npm-debug.log*
 
 # simulator output
 sim/output/
+
+# backups
+*.bak

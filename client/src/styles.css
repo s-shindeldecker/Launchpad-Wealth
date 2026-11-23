@@ -65,7 +65,7 @@ button { font: inherit; color: inherit; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---------- welcome ---------- */
-.welcome__hero { background: linear-gradient(160deg, var(--hero-from), var(--hero-to)); color: var(--primary-text); margin: -50px 0 0; padding: 90px 24px 40px; border-radius: 0 0 32px 32px; display: flex; flex-direction: column; gap: 14px; }
+.welcome__hero { background: var(--hero-bg, linear-gradient(160deg, var(--hero-from), var(--hero-to))); color: var(--primary-text); margin: -50px 0 0; padding: 90px 24px 40px; border-radius: 0 0 32px 32px; display: flex; flex-direction: column; gap: 14px; }
 .phone--android .welcome__hero { margin-top: -36px; padding-top: 70px; }
 .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 20px; }
 .logo__badge { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.35); box-shadow: 0 4px 12px rgba(0,0,0,.18); }
@@ -112,7 +112,6 @@ button { font: inherit; color: inherit; }
 .result .screen__subtitle { margin: 0; }
 .result__icon { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; font-weight: 800; color: #fff; }
 .result__icon--success { background: var(--success); }
-.result__icon--brand { background: var(--accent); }
 .result__icon--danger { background: var(--danger); }
 .result__icon--warning { background: var(--warning); }
 .init-error { margin: auto; padding: 24px; text-align: center; color: var(--danger); font-family: ui-monospace, monospace; font-size: 13px; }
