@@ -3,6 +3,8 @@
 :root {
   --primary: #333; --primary-text: #fff; --accent: #eee; --background: #fafafa;
   --surface: #fff; --text: #111; --muted: #666; --border: #ddd;
+  /* Optional brand keys: fall back to existing ones so older brand files look unchanged. */
+  --surface-alt: var(--surface); --accent-text: var(--primary);
   --success: #1a7f37; --warning: #b45309; --danger: #c62828;
   --hero-from: #333; --hero-to: #555;
   --font: system-ui, sans-serif;
@@ -48,13 +50,13 @@ button { font: inherit; color: inherit; }
 .btn:active:not(:disabled) { transform: scale(.98); }
 .btn:disabled { opacity: .45; cursor: default; }
 .btn--primary { background: var(--primary); color: var(--primary-text); }
-.btn--secondary { background: var(--accent); color: var(--primary); }
+.btn--secondary { background: var(--accent); color: var(--accent-text); }
 .btn--ghost { background: transparent; color: var(--primary); }
 .link-btn { background: none; border: 0; padding: 4px 0; color: var(--primary); font-weight: 600; cursor: pointer; font-size: 15px; }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field__label { font-size: 14px; font-weight: 600; }
-.field__input { height: 52px; border: 1.5px solid var(--border); border-radius: 12px; padding: 0 14px; font: inherit; font-size: 16px; background: var(--surface); color: var(--text); outline: none; }
+.field__input { height: 52px; border: 1.5px solid var(--border); border-radius: 12px; padding: 0 14px; font: inherit; font-size: 16px; background: var(--surface-alt); color: var(--text); outline: none; }
 .field__input:focus { border-color: var(--primary); }
 .field__input--error { border-color: var(--danger); }
 .field__hint { font-size: 13px; color: var(--muted); }
@@ -73,7 +75,7 @@ button { font: inherit; color: inherit; }
 .welcome__subtitle { margin: 0; opacity: .9; font-size: 16px; line-height: 1.45; }
 .welcome__bullets { list-style: none; padding: 24px; margin: 0; display: flex; flex-direction: column; gap: 14px; flex: 1; }
 .welcome__bullets li { display: flex; align-items: center; gap: 12px; font-weight: 600; }
-.tick { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--primary); font-size: 14px; }
+.tick { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-text); font-size: 14px; }
 .welcome .screen__footer { padding-top: 0; }
 
 /* ---------- lists / products ---------- */
@@ -81,7 +83,7 @@ button { font: inherit; color: inherit; }
 .list__item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); cursor: pointer; text-align: left; }
 .list__label { flex: 1; font-weight: 600; }
 .list__chev { color: var(--muted); font-size: 22px; }
-.bank-avatar { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--accent); color: var(--primary); font-weight: 800; }
+.bank-avatar { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--accent); color: var(--accent-text); font-weight: 800; }
 .bank-avatar--lg { width: 56px; height: 56px; border-radius: 14px; font-size: 22px; }
 .bank-avatar--brand { background: var(--primary); color: var(--primary-text); }
 
@@ -104,8 +106,8 @@ button { font: inherit; color: inherit; }
 
 /* ---------- deposit ---------- */
 .amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
-.chip { height: 64px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); font-size: 20px; font-weight: 800; cursor: pointer; }
-.chip--selected { border-color: var(--primary); background: var(--accent); color: var(--primary); }
+.chip { height: 64px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface-alt); font-size: 20px; font-weight: 800; cursor: pointer; }
+.chip--selected { border-color: var(--primary); background: var(--accent); color: var(--accent-text); }
 
 /* ---------- result states ---------- */
 .result { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 14px; padding: 0 12px; }

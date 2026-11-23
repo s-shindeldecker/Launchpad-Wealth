@@ -18,6 +18,13 @@ export function brandGradient(palette = {}, angle = 135) {
   return `linear-gradient(${angle}deg, ${(colors.length === 1 ? [colors[0], colors[0]] : colors).join(', ')})`;
 }
 
+// palette key → CSS variable: textMuted → --text-muted
+const cssVar = (k) => `--${k.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())}`;
+
+// Redesign key → key the stylesheet reads (e.g. textMuted → --muted).
+// surfaceAlt and accentText need no alias: they map straight to --surface-alt / --accent-text.
+const PALETTE_ALIASES = { textMuted: 'muted' };
+
 // `font` may be a CSS font-family string or { family, googleFontsUrl }.
 function fontOf(brand) {
   return typeof brand.font === 'string' ? { family: brand.font } : brand.font ?? {};
@@ -35,9 +42,16 @@ export function BrandProvider({ children }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    for (const [k, v] of Object.entries(brand.palette || {})) {
+    const palette = brand.palette || {};
+    for (const [k, v] of Object.entries(palette)) {
       if (typeof v !== 'string') continue; // e.g. palette.gradient (array) → --hero-bg below
-      root.style.setProperty(`--${k.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())}`, v);
+      root.style.setProperty(cssVar(k), v);
+    }
+    // Newer key names → the variable the stylesheet reads. The older name wins if both exist.
+    for (const [newKey, oldKey] of Object.entries(PALETTE_ALIASES)) {
+      if (typeof palette[newKey] === 'string' && palette[oldKey] === undefined) {
+        root.style.setProperty(cssVar(oldKey), palette[newKey]);
+      }
     }
     // Welcome hero: palette.gradient when present, else heroFrom/heroTo (CSS fallback).
     if (Array.isArray(brand.palette?.gradient) && brand.palette.gradient.length) {
