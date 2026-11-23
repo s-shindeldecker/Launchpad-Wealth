@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 // 390×844 viewport inside device chrome — stand-in for the customer's native app.
-export default function PhoneFrame({ platform, children }) {
+// `aside` renders beside the device (presenter panels such as the Inspector).
+export default function PhoneFrame({ platform, children, aside }) {
   const [time, setTime] = useState(() => clock());
   const [zoom, setZoom] = useState(fitZoom);
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function PhoneFrame({ platform, children }) {
           {platform !== 'android' && <div className="home-indicator" />}
         </div>
       </div>
+      {aside}
     </div>
   );
 }

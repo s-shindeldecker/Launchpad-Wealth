@@ -1,0 +1,10 @@
+{
+  "name": "inspector",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Sidecar: tails server.log and streams parsed events over SSE for the client's Inspector panel.",
+  "scripts": {
+    "start": "node index.js"
+  }
+}

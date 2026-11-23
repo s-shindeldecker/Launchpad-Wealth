@@ -8,6 +8,7 @@ import BankLink from './screens/BankLink.jsx';
 import ChooseProduct from './screens/ChooseProduct.jsx';
 import Deposit from './screens/Deposit.jsx';
 import Done from './screens/Done.jsx';
+import Inspector from './inspector/Inspector.jsx';
 
 // Linear onboarding flow as a small state machine (mirrors a native nav stack).
 const SCREENS = [Welcome, Credentials, Kyc, BankLink, ChooseProduct, Deposit, Done];
@@ -24,8 +25,9 @@ export default function App() {
     initDevice().then(setDevice).catch((err) => setInitError(err.message));
   }, []);
 
-  if (initError) return <PhoneFrame><p className="init-error">{initError}</p></PhoneFrame>;
-  if (!device) return <PhoneFrame />;
+  const inspector = <Inspector />;
+  if (initError) return <PhoneFrame aside={inspector}><p className="init-error">{initError}</p></PhoneFrame>;
+  if (!device) return <PhoneFrame aside={inspector} />;
 
   const Screen = SCREENS[step];
   const update = (patch) => setSession((s) => ({ ...s, ...patch }));
@@ -42,7 +44,7 @@ export default function App() {
   };
 
   return (
-    <PhoneFrame platform={device.platform}>
+    <PhoneFrame platform={device.platform} aside={inspector}>
       <Screen key={step} session={session} update={update} nav={nav} />
     </PhoneFrame>
   );

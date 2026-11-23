@@ -6,13 +6,15 @@
   "workspaces": [
     "client",
     "server",
-    "sim"
+    "sim",
+    "inspector"
   ],
   "scripts": {
     "dev": "concurrently -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
     "start:server": "npm run start -w server",
-    "sim": "npm run start -w sim --"
+    "sim": "npm run start -w sim --",
+    "inspector": "npm run start -w inspector"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

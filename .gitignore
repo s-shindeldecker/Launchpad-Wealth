@@ -24,3 +24,6 @@ sim/output/
 
 # backups
 *.bak
+
+# inspector input (server stdout via tee)
+server.log
