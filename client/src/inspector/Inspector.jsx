@@ -7,7 +7,20 @@ import { getContext } from '../ld/index.js';
 // viewports. If the sidecar is down it says "Inspector offline" and nothing else changes.
 const URL = import.meta.env.VITE_INSPECTOR_URL || 'http://localhost:4200';
 const MAX = 200;
+const OPEN_KEY = 'demo.inspectorOpen'; // show/hide choice, survives reload
 let seq = 0; // stable React keys for incoming events
+
+function readOpen() {
+  try { return localStorage.getItem(OPEN_KEY) === '1'; } catch { return false; }
+}
+function saveOpen(v) {
+  try { localStorage.setItem(OPEN_KEY, v ? '1' : '0'); } catch { /* private mode: fine */ }
+}
+// Don't steal Shift+I while someone is typing an email or name into the phone.
+function isTyping(target) {
+  const tag = target?.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable;
+}
 
 const short = (k) => (k && k.length > 10 ? `${k.slice(0, 4)}…${k.slice(-4)}` : k ?? '');
 
@@ -52,6 +65,27 @@ export default function Inspector() {
   const [events, setEvents] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [mine, setMine] = useState(myDeviceKey);
+  const [open, setOpen] = useState(readOpen); // hidden by default
+  // Clear is client-side: drop the list and ignore anything up to this moment, including
+  // the backlog the sidecar resends if the stream reconnects. New events keep arriving.
+  const [clearedAt, setClearedAt] = useState(null);
+
+  const toggle = () =>
+    setOpen((v) => {
+      saveOpen(!v);
+      return !v;
+    });
+
+  useEffect(() => {
+    const onKey = (ev) => {
+      if (ev.shiftKey && !ev.metaKey && !ev.ctrlKey && !ev.altKey && ev.code === 'KeyI' && !isTyping(ev.target)) {
+        ev.preventDefault();
+        toggle();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   useEffect(() => {
     let es;
@@ -81,6 +115,9 @@ export default function Inspector() {
     return () => es.close();
   }, []);
 
+  // The SSE connection above stays open while the panel is hidden, so nothing is missed;
+  // the list just isn't rendered.
+
   // The device key exists once the LD client has started; pick it up if we rendered first.
   useEffect(() => {
     if (mine) return undefined;
@@ -93,54 +130,81 @@ export default function Inspector() {
 
   // Default: this browser's device only. Context-less "not attributed" lines have no device
   // key; sim devices always send a context, so those are shown here too.
+  const afterClear = clearedAt ? events.filter((e) => e.ts && e.ts > clearedAt) : events;
   const visible = showAll
-    ? events
-    : events.filter((e) => (e.deviceKey ? e.deviceKey === mine : e.kind === 'not_attributed'));
+    ? afterClear
+    : afterClear.filter((e) => (e.deviceKey ? e.deviceKey === mine : e.kind === 'not_attributed'));
+
+  const clear = () => {
+    setClearedAt(new Date().toISOString());
+    setEvents([]);
+  };
+
+  const toggleButton = (
+    <button
+      type="button"
+      className={`inspector-toggle${open ? ' inspector-toggle--open' : ''}`}
+      onClick={toggle}
+      aria-pressed={open}
+      title="Show/hide Inspector (Shift+I)"
+    >
+      {open ? 'Hide inspector' : 'Inspector'} <kbd>⇧I</kbd>
+    </button>
+  );
+  if (!open) return toggleButton;
 
   return (
-    <aside className="inspector" aria-label="Inspector">
-      <header className="inspector__head">
-        <span className="inspector__title">Inspector</span>
-        <span className={`inspector__dot inspector__dot--${status}`} />
-      </header>
-      {status === 'offline' ? (
-        <p className="inspector__offline">Inspector offline</p>
-      ) : (
-        <>
-          <div className="inspector__meta">
-            <span>This device: {mine ? short(mine) : '…'}</span>
-            <label className="inspector__toggle">
-              <input type="checkbox" checked={showAll} onChange={(ev) => setShowAll(ev.target.checked)} />
-              Show all traffic
-            </label>
-          </div>
-          <ol className="inspector__list">
-            {visible.length === 0 && (
-              <li className="inspector__empty">
-                {showAll ? 'No server events yet.' : 'No server events for this device yet.'}
-              </li>
+    <>
+      {toggleButton}
+      <aside className="inspector" aria-label="Inspector">
+        <header className="inspector__head">
+          <span className="inspector__title">Inspector</span>
+          <span className="inspector__actions">
+            {status !== 'offline' && (
+              <button type="button" className="inspector__clear" onClick={clear}>Clear</button>
             )}
-            {visible.map((e) => (
-              <li
-                key={e.id}
-                className={[
-                  'inspector__line',
-                  `inspector__line--${e.kind}`,
-                  showAll && e.simulated ? 'inspector__line--sim' : '',
-                ].join(' ')}
-                title={e.message}
-              >
-                {e.ts && (
-                  <time className="inspector__ts">
-                    {new Date(e.ts).toLocaleTimeString('en-GB', { hour12: false })}
-                  </time>
-                )}
-                <span>{describe(e, formatMoney)}</span>
-              </li>
-            ))}
-          </ol>
-        </>
-      )}
-    </aside>
+            <span className={`inspector__dot inspector__dot--${status}`} />
+          </span>
+        </header>
+        {status === 'offline' ? (
+          <p className="inspector__offline">Inspector offline</p>
+        ) : (
+          <>
+            <div className="inspector__meta">
+              <span>This device: {mine ? short(mine) : '…'}</span>
+              <label className="inspector__toggle">
+                <input type="checkbox" checked={showAll} onChange={(ev) => setShowAll(ev.target.checked)} />
+                Show all traffic
+              </label>
+            </div>
+            <ol className="inspector__list">
+              {visible.length === 0 && (
+                <li className="inspector__empty">
+                  {showAll ? 'No server events yet.' : 'No server events for this device yet.'}
+                </li>
+              )}
+              {visible.map((e) => (
+                <li
+                  key={e.id}
+                  className={[
+                    'inspector__line',
+                    `inspector__line--${e.kind}`,
+                    showAll && e.simulated ? 'inspector__line--sim' : '',
+                  ].join(' ')}
+                  title={e.message}
+                >
+                  {e.ts && (
+                    <time className="inspector__ts">
+                      {new Date(e.ts).toLocaleTimeString('en-GB', { hour12: false })}
+                    </time>
+                  )}
+                  <span>{describe(e, formatMoney)}</span>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+      </aside>
+    </>
   );
 }
