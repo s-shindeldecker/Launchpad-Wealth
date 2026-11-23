@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PhoneFrame from './device/PhoneFrame.jsx';
+import { installNewDeviceShortcut } from './device/newDevice.js';
 import { initDevice } from './ld/index.js';
 import Welcome from './screens/Welcome.jsx';
 import Credentials from './screens/Credentials.jsx';
@@ -19,6 +20,9 @@ export default function App() {
   const [initError, setInitError] = useState(null);
   const [step, setStep] = useState(0);
   const [session, setSession] = useState({});
+
+  // Hidden presenter shortcut: Shift+N wipes this device's stored keys and reloads.
+  useEffect(() => installNewDeviceShortcut(), []);
 
   // Starts the LD client with the anonymous device context. Does NOT evaluate any flag.
   useEffect(() => {
