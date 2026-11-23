@@ -1,3 +1,4 @@
+import { BrandIcon } from '../brand/BrandIcon.jsx';
 import { fill, useBrand } from '../brand/BrandProvider.jsx';
 import { Button, Layout } from '../components/Layout.jsx';
 
@@ -13,7 +14,9 @@ export default function Done({ nav, session }) {
   return (
     <Layout footer={<Button onClick={nav.restart}>{c.cta}</Button>}>
       <div className="result result--celebrate">
-        <div className="result__icon result__icon--success">✓</div>
+        <div className="result__icon result__icon--brand">
+          <BrandIcon size={38} colorKey="primary" />
+        </div>
         <h1 className="screen__title">{c.title}</h1>
         <p className="screen__subtitle">{body}</p>
       </div>

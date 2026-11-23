@@ -3,6 +3,7 @@
   "name": "Kestrel",
   "legalName": "Kestrel Money plc",
   "logo": { "glyph": "🪶", "text": "Kestrel" },
+  "icon": "feather",
   "palette": {
     "primary": "#0E7C66",
     "primaryText": "#FFFFFF",

@@ -1,3 +1,4 @@
+import { BrandIcon, brandGradient } from '../brand/BrandIcon.jsx';
 import { useBrand } from '../brand/BrandProvider.jsx';
 import { Button } from '../components/Layout.jsx';
 
@@ -9,7 +10,9 @@ export default function Welcome({ nav }) {
     <div className="screen welcome">
       <div className="welcome__hero">
         <div className="logo">
-          <span className="logo__glyph">{brand.logo.glyph}</span>
+          <span className="logo__badge" style={{ background: brandGradient(brand.palette) }}>
+            <BrandIcon size={22} colorKey="primaryText" />
+          </span>
           <span className="logo__text">{brand.logo.text}</span>
         </div>
         <h1 className="welcome__title">{c.title}</h1>

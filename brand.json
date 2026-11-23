@@ -3,6 +3,7 @@
   "name": "Launchpad",
   "legalName": "Launchpad Wealth Ltd",
   "logo": { "glyph": "🚀", "text": "Launchpad" },
+  "icon": "rocket",
   "palette": {
     "primary": "#5B3DF5",
     "primaryText": "#FFFFFF",
