@@ -116,10 +116,12 @@ export function evaluateDepositPrompt() {
   return depositPrompt;
 }
 
-// Kill switch. TODO(Sat/Sun, after Databricks): client.variation('onboarding-deposit-step', true)
-// Not wired yet — the flag doesn't exist, and evaluating it now would be noise.
+// Kill switch `onboarding-deposit-step`, evaluated on screen 6 BEFORE the experiment flag.
+// The Deposit screen calls evaluateDepositPrompt() only when this returns true, so a device
+// that gets the fallback message never evaluates onboarding-deposit-prompt and is never
+// counted as exposed. Code default true: if LaunchDarkly is unreachable, deposits stay on.
 export function depositStepEnabled() {
-  return true;
+  return client.boolVariation('onboarding-deposit-step', true);
 }
 
 // Optional client-side funnel events: kyc_started, bank_linked, product_selected.
